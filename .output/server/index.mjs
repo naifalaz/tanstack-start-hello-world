@@ -1267,19 +1267,19 @@ const assets = {
     "size": 15002,
     "path": "../public/tanstack-word-logo-white.svg"
   },
+  "/assets/index-0cQJ9vsC.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": '"42b18-TEC6zANvnbU2GDPaYXEsXoYC0nQ"',
+    "mtime": "2026-01-17T04:48:45.288Z",
+    "size": 273176,
+    "path": "../public/assets/index-0cQJ9vsC.js"
+  },
   "/assets/index-BXZSW-aO.css": {
     "type": "text/css; charset=utf-8",
     "etag": '"2b31-OmGfgLi+OjrDaouVB2Aeyr9C3II"',
-    "mtime": "2026-01-16T21:16:03.319Z",
+    "mtime": "2026-01-17T04:48:45.288Z",
     "size": 11057,
     "path": "../public/assets/index-BXZSW-aO.css"
-  },
-  "/assets/index-CZ8QRTj4.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": '"42ab8-bvI+4tWhoDPa8wq0Jrk9coSHJG8"',
-    "mtime": "2026-01-16T21:16:03.320Z",
-    "size": 273080,
-    "path": "../public/assets/index-CZ8QRTj4.js"
   }
 };
 function readAsset(id) {
