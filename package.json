@@ -8,9 +8,7 @@
     "scripts": {
         "dev": "vite --port 3000 --host",
         "build": "vite build",
-        "preview": "vite preview",
-        "test": "vitest run",
-        "typecheck": "tsc --noEmit"
+        "preview": "vite preview"
     },
     "dependencies": {
         "@tailwindcss/vite": "^4.0.6",
@@ -39,8 +37,5 @@
         "vite": "^7.1.7",
         "vitest": "^3.0.5",
         "web-vitals": "^5.1.0"
-    },
-    "engines": {
-        "node": ">=18.x"
     }
 }
