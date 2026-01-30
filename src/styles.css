@@ -12,3 +12,41 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+/* Slower spinning animation for the logo */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+/* Background color animation for heading */
+@keyframes bg-color-change {
+  0% {
+    background-color: #fbbf24;
+  }
+
+  /* amber-300 */
+  50% {
+    background-color: #fde68a;
+  }
+
+  /* amber-200 */
+  100% {
+    background-color: #fbbf24;
+  }
+
+  /* back to amber-300 */
+}
+
+.animate-bg-change {
+  animation: bg-color-change 5s ease-in-out infinite;
+}
