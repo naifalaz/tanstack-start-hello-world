@@ -12,6 +12,9 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import './styles.css';
 import App from './App.tsx';
 
+import ProductPage from './features/products/ProductPage.tsx';
+//
+
 const rootRoute = createRootRoute({
   component: () => (
     <>
@@ -21,13 +24,23 @@ const rootRoute = createRootRoute({
   ),
 });
 
+//
+
+//
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   component: App,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute]);
+const productRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/product",
+  component: ProductPage,
+});
+
+
+const routeTree = rootRoute.addChildren([indexRoute, productRoute]);
 
 const router = createRouter({
   routeTree,
