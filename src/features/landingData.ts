@@ -7,9 +7,9 @@ export type Feature = {
 };
 
 export const features: Feature[] = [
-  { title: "Instant setup", description: "Start building quickly.", tone: "primary" },
-  { title: "TypeScript reliability", description: "Catch mistakes early.", tone: "neutral" },
-  { title: "Tailwind styling", description: "Ship consistent design.", tone: "neutral" },
+  { title: "Instant setup", description: "Start building in minutes with a modern TanStack Start Foundation.", tone: "primary" },
+  { title: "TypeScript reliability", description: "Catch data and UI mistakes before they reach your users.", tone: "neutral" },
+  { title: "Tailwind styling", description: "Ship a clean, consistent design without wrestling CSS naming.", tone: "neutral" },
 ];
 
 export type CallToAction = {

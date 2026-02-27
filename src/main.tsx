@@ -11,8 +11,8 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
 import './styles.css';
 import App from './App.tsx';
-
 import ProductPage from './features/products/ProductPage.tsx';
+import ContactPage from './features/contact/ContactPage.tsx';
 //
 
 const rootRoute = createRootRoute({
@@ -35,12 +35,17 @@ const indexRoute = createRoute({
 
 const productRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/product",
+  path: "product",
   component: ProductPage,
 });
 
+const contactRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'contact',
+  component: ContactPage,
+})
 
-const routeTree = rootRoute.addChildren([indexRoute, productRoute]);
+const routeTree = rootRoute.addChildren([indexRoute, productRoute, contactRoute]);
 
 const router = createRouter({
   routeTree,
