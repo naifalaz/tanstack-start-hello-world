@@ -1,236 +1,106 @@
-import React from 'react';
-import type {ContactFormState, ContactFormErrors, ContactFormTouched } from "./types"
+import { useState } from "react";
+import { supabase } from "../../lib/supabaseClient";
 
+export default function ContactForm() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
 
-// type ContactFormState = {
-//   name: string;
-//   email: string;
-//   message: string;
-// };
-
-// export type ContactFormErrors = Partial<Record<keyof ContactFormState, string>>;
-// export type ContactFormTouched = Partial<Record<keyof ContactFormState, boolean>>;
-
-function validate(values: ContactFormState): ContactFormErrors {
-  const errors: ContactFormErrors = {};
-
-  if (!values.name.trim()) {
-    errors.name = 'Please enter your name.';
-  }
-
-  if (!values.email.trim()) {
-    errors.email = 'Please enter your email address.';
-  } else {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(values.email)) {
-      errors.email = 'Please enter a valid email.';
-    }
-  }
-
-  if (!values.message.trim()) {
-    errors.message = 'Please enter a message.';
-  }
-
-  return errors;
-}
-
-export function ContactForm(): React.JSX.Element {
-  const initialForm: ContactFormState = {
-    name: '',
-    email: '',
-    message: '',
-  };
-
-  const [values, setValues] = React.useState(initialForm);
-  const [errors, setErrors] = React.useState<ContactFormErrors>({});
-  const [touched, setTouched] = React.useState<ContactFormTouched>({});
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [isSubmitted, setIsSubmitted] = React.useState(false);
-
-  // Refs for focus management
-  const nameRef = React.useRef<HTMLInputElement>(null);
-  const emailRef = React.useRef<HTMLInputElement>(null);
-  const messageRef = React.useRef<HTMLTextAreaElement>(null);
-
-  const isFormValid = Object.keys(validate(values)).length === 0;
-  const isSubmitDisabled = isSubmitting || !isFormValid;
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
-    const { name, value } = e.target;
-    setValues((prev) => ({ ...prev, [name]: value }));
+    setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleBlur(
-    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    const { name } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-
-    const fieldErrors = validate(values);
-    setErrors((prev) => ({
-      ...prev,
-      [name]: fieldErrors[name as keyof ContactFormState],
-    }));
-  }
-
-  async function fakeSubmit(data: ContactFormState) {
-    return new Promise<void>((resolve) =>
-      setTimeout(() => resolve(), 2000)
-    );
-  }
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const nextErrors = validate(values);
-    setErrors(nextErrors);
-    setTouched({ name: true, email: true, message: true });
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
-    if (Object.keys(nextErrors).length > 0) {
-      // Focus first invalid field
-      if (nextErrors.name) nameRef.current?.focus();
-      else if (nextErrors.email) emailRef.current?.focus();
-      else if (nextErrors.message) messageRef.current?.focus();
-      return;
-    }
-
-    setIsSubmitting(true);
     try {
-      await fakeSubmit(values);
-      setIsSubmitted(true);
-      setValues(initialForm);
-      setTouched({});
-      setErrors({});
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+      const { error } = await (supabase as any).from("messages").insert([
+          {
+            name: form.name,
+            email: form.email,
+            subject: form.subject,
+            message: form.message,
+            status: "new",
+          },
+        ] as any); //  REQUIRED FIX
 
-  function inputClass(field: keyof ContactFormState) {
-    return (
-      'w-full rounded-md border px-3 py-2 outline-none ' +
-      (errors[field] && touched[field]
-        ? 'border-red-500 focus:border-red-400'
-        : 'border-gray-300 focus:border-indigo-500')
-    );
+      if (error) throw error;
+
+      setSuccess("Message sent successfully!");
+      setForm({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
-    >
-      {/* Accessible Success Message */}
-      {isSubmitted && (
-        <div
-          aria-live="polite"
-          aria-atomic="true"
-          className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900"
-        >
-          Thanks! Your message was sent to SkyLaunch.
-        </div>
-      )}
+    <div style={{ padding: 20 }}>
+      <h2>Contact Us</h2>
 
-      {/* NAME */}
-      <div>
-        <label htmlFor="contact-name" className="text-sm font-medium">
-          Name
-        </label>
+      <form onSubmit={handleSubmit}>
         <input
-          ref={nameRef}
-          id="contact-name"
           name="name"
-          value={values.name}
+          placeholder="Name"
+          value={form.name}
           onChange={handleChange}
-          onBlur={handleBlur}
-          aria-invalid={Boolean(errors.name)}
-          aria-describedby={errors.name ? 'contact-name-error' : undefined}
-          className={inputClass('name')}
+          required
         />
-        {errors.name && touched.name && (
-          <p
-            id="contact-name-error"
-            role="alert"
-            className="text-sm text-red-600 mt-1"
-          >
-            {errors.name}
-          </p>
-        )}
-      </div>
+        <br />
 
-      {/* EMAIL */}
-      <div>
-        <label htmlFor="contact-email" className="text-sm font-medium">
-          Email
-        </label>
         <input
-          ref={emailRef}
-          id="contact-email"
           name="email"
-          type="email"
-          value={values.email}
+          placeholder="Email"
+          value={form.email}
           onChange={handleChange}
-          onBlur={handleBlur}
-          aria-invalid={Boolean(errors.email)}
-          aria-describedby={errors.email ? 'contact-email-error' : undefined}
-          className={inputClass('email')}
+          required
         />
-        {errors.email && touched.email && (
-          <p
-            id="contact-email-error"
-            role="alert"
-            className="text-sm text-red-600 mt-1"
-          >
-            {errors.email}
-          </p>
-        )}
-      </div>
+        <br />
 
-      {/* MESSAGE */}
-      <div>
-        <label htmlFor="contact-message" className="text-sm font-medium">
-          Message
-        </label>
+        <input
+          name="subject"
+          placeholder="Subject"
+          value={form.subject}
+          onChange={handleChange}
+          required
+        />
+        <br />
+
         <textarea
-          ref={messageRef}
-          id="contact-message"
           name="message"
-          rows={5}
-          value={values.message}
+          placeholder="Message"
+          value={form.message}
           onChange={handleChange}
-          onBlur={handleBlur}
-          aria-invalid={Boolean(errors.message)}
-          aria-describedby={
-            errors.message ? 'contact-message-error' : undefined
-          }
-          className={inputClass('message')}
+          required
         />
-        {errors.message && touched.message && (
-          <p
-            id="contact-message-error"
-            role="alert"
-            className="text-sm text-red-600 mt-1"
-          >
-            {errors.message}
-          </p>
-        )}
-      </div>
+        <br />
 
-      {/* SUBMIT BUTTON */}
-      <button
-        type="submit"
-        disabled={isSubmitDisabled}
-        className={
-          'rounded-md px-4 py-2 text-sm font-medium text-white transition ' +
-          (isSubmitDisabled
-            ? 'bg-gray-400 opacity-60 cursor-not-allowed'
-            : 'bg-zinc-900 hover:bg-zinc-800')
-        }
-      >
-        {isSubmitting ? 'Sending…' : 'Send Message'}
-      </button>
-    </form>
+        <button type="submit" disabled={loading}>
+          {loading ? "Sending..." : "Send"}
+        </button>
+      </form>
+
+      {success && <p style={{ color: "green" }}>{success}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </div>
   );
 }

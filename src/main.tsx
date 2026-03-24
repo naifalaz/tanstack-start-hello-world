@@ -1,70 +1,123 @@
+// ✅ Debug ENV (remove later if you want)
+console.log("ENV URL:", import.meta.env.VITE_SUPABASE_URL);
+console.log("ENV KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY);
+
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
+
 import {
   Outlet,
   RouterProvider,
   createRootRoute,
   createRoute,
   createRouter,
+  Link,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
 import './styles.css';
 import App from './App.tsx';
-import ProductPage from './features/products/ProductPage.tsx';
 import ContactPage from './features/contact/ContactPage.tsx';
-//
+import ProductPage from './features/products/ProductPage.tsx';
 
+// ✅ Navigation Bar
+function NavBar() {
+  return (
+    <nav
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '1rem',
+        borderBottom: '1px solid #ccc',
+      }}
+    >
+      {/* Left */}
+      <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
+        SkyLaunch
+      </div>
+
+      {/* Right */}
+      <div>
+        <Link
+          to="/"
+          activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
+          style={{ marginRight: '1rem' }}
+        >
+          Home
+        </Link>
+
+        <Link
+          to="/products"
+          activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
+          style={{ marginRight: '1rem' }}
+        >
+          Products
+        </Link>
+
+        <Link
+          to="/contact"
+          activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
+        >
+          Contact
+        </Link>
+      </div>
+    </nav>
+  );
+}
+
+// ✅ Root Route (layout)
 const rootRoute = createRootRoute({
   component: () => (
     <>
+      <NavBar />
       <Outlet />
       <TanStackRouterDevtools />
     </>
   ),
 });
 
-//
-
-//
+// ✅ Routes
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
+  path: '/', // ✅ Home route
   component: App,
 });
 
 const productRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "product",
+  path: '/products',
   component: ProductPage,
 });
 
 const contactRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: 'contact',
+  path: '/contact',
   component: ContactPage,
-})
-
-const routeTree = rootRoute.addChildren([indexRoute, productRoute, contactRoute]);
-
-const router = createRouter({
-  routeTree,
-  context: {},
-  defaultPreload: 'intent',
-  scrollRestoration: true,
-  defaultStructuralSharing: true,
-  defaultPreloadStaleTime: 0,
 });
 
-// Mount the router into the DOM
-const root = ReactDOM.createRoot(document.getElementById('app')!);
-root.render(
+// ✅ Route Tree
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  productRoute,
+  contactRoute,
+]);
+
+// ✅ Router
+const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: () => <h1>Page Not Found ❌</h1>,
+});
+
+// ✅ Mount React App (FIXED ROOT)
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error("Root element not found. Check index.html");
+}
+
+ReactDOM.createRoot(rootElement).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-//reportWebVitals()

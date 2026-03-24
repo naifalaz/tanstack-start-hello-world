@@ -78,5 +78,5 @@ export function ProductHighlight({
                 </button>
             </div>
         </article>
-    )
+    
 }
