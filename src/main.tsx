@@ -19,8 +19,16 @@ import './styles.css';
 import App from './App.tsx';
 import ContactPage from './features/contact/ContactPage.tsx';
 import ProductPage from './features/products/ProductPage.tsx';
+import SemanticDemoPage from './routes/semantic_demo.tsx';
+import { SemanticSearchPage } from './features/search/SemanticSearchPage';
+
+import { HybridSearchPage } from './features/search/HybridSearchPage';
+import { AiSearchPage } from './features/aiSearch/AiSearchPage';
+
 
 // ✅ Navigation Bar
+//import { Link } from '@tanstack/router';
+
 function NavBar() {
   return (
     <nav
@@ -28,21 +36,31 @@ function NavBar() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '1rem',
+        padding: '1rem 2rem',
         borderBottom: '1px solid #ccc',
+        backgroundColor: '#f9f9f9', // subtle background for contrast
       }}
     >
       {/* Left */}
-      <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
+      <div style={{ fontWeight: 'bold', fontSize: '1.4rem', color: '#111' }}>
         SkyLaunch
       </div>
 
+      {/* Left navigation link */}
+      <Link
+        to="/search"
+        activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
+        style={{ marginRight: '2rem', textDecoration: 'none', color: '#333' }}
+      >
+        Search
+      </Link>
+
       {/* Right */}
-      <div>
+      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
         <Link
           to="/"
           activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
-          style={{ marginRight: '1rem' }}
+          style={{ textDecoration: 'none', color: '#333' }}
         >
           Home
         </Link>
@@ -50,7 +68,7 @@ function NavBar() {
         <Link
           to="/products"
           activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
-          style={{ marginRight: '1rem' }}
+          style={{ textDecoration: 'none', color: '#333' }}
         >
           Products
         </Link>
@@ -58,14 +76,31 @@ function NavBar() {
         <Link
           to="/contact"
           activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
+          style={{ textDecoration: 'none', color: '#333' }}
         >
           Contact
+        </Link>
+
+        <Link
+          to="/semantic-demo"
+          activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
+          style={{ textDecoration: 'none', color: '#333' }}
+        >
+          Semantic Demo
+        </Link>
+
+        {/* ✅ New AI Search link */}
+        <Link
+          to="/ai-search"
+          activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
+          style={{ textDecoration: 'none', color: '#333' }}
+        >
+          AI Search
         </Link>
       </div>
     </nav>
   );
 }
-
 // ✅ Root Route (layout)
 const rootRoute = createRootRoute({
   component: () => (
@@ -96,11 +131,41 @@ const contactRoute = createRoute({
   component: ContactPage,
 });
 
+
+const semanticDemoRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/semantic-demo',
+  component: SemanticDemoPage,
+});
+
+const searchRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/search',
+  component: SemanticSearchPage,
+});
+
+const hybridSearchRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/hybrid-search',
+  component: function HybridSearchRoute(): React.ReactElement {
+    return <HybridSearchPage />;
+  },
+});
+
+const aiSearchRoute = createRoute({
+  getParentRoute: () => rootRoute, // adapt to your existing root
+  path: '/ai-search',
+  component: AiSearchPage,
+});
 // ✅ Route Tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
   productRoute,
   contactRoute,
+  semanticDemoRoute,
+  searchRoute,
+  hybridSearchRoute,
+  aiSearchRoute,
 ]);
 
 // ✅ Router

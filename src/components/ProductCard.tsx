@@ -1,5 +1,5 @@
-import * as React from "react";
-
+//import * as React from "react";
+export type ProductView = "grid" | "list";
 export type ProductCardProps = {
   id: string;
   title: string;

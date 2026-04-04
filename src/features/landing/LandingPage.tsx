@@ -1,6 +1,6 @@
 // src/features/landing/LandingPage.tsx
 
-import * as React from "react";
+//import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { features } from "../landingData";
 import type { Feature } from "../landingData";

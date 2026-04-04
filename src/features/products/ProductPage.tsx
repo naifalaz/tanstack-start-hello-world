@@ -145,7 +145,16 @@ export default function ProductPage() {
     if (!newProductName) return;
     setProducts([
       ...products,
-      { id: Date.now().toString(), title: newProductName, badge_text: 0, description: "" },
+      {
+        id: Date.now().toString(),
+        title: newProductName,
+        badge_text: 0,
+        description: "",
+        created_at: new Date().toISOString(),
+        featured: false,
+        is_selected: false,
+        image_url: "",
+      },
     ]);
     setNewProductName("");
   };

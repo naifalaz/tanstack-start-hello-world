@@ -1,6 +1,6 @@
 // src/features/products/ViewToggle.tsx
 
-import type { ProductView } from "../.../components/ProductCard"
+import type { ProductView } from "../../components/ProductCard"
 
 type ViewToggleProps = {
     value: ProductView

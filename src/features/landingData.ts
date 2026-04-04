@@ -4,12 +4,13 @@ export type Feature = {
   title: string;
   description: string;
   tone: "primary" | "neutral";
+  icon: "bolt" | "shield" | "chart"; // <-- add this
 };
 
 export const features: Feature[] = [
-  { title: "Instant setup", description: "Start building in minutes with a modern TanStack Start Foundation.", tone: "primary" },
-  { title: "TypeScript reliability", description: "Catch data and UI mistakes before they reach your users.", tone: "neutral" },
-  { title: "Tailwind styling", description: "Ship a clean, consistent design without wrestling CSS naming.", tone: "neutral" },
+  { title: "Instant setup", description: "Start building in minutes with a modern TanStack Start Foundation.", tone: "primary", icon: "bolt" },
+  { title: "TypeScript reliability", description: "Catch data and UI mistakes before they reach your users.", tone: "neutral", icon: "shield" },
+  { title: "Tailwind styling", description: "Ship a clean, consistent design without wrestling CSS naming.", tone: "neutral", icon: "chart" },
 ];
 
 export type CallToAction = {

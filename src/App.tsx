@@ -1,4 +1,4 @@
-import * as React from "react";
+//import * as React from "react";
 import { LandingPage } from "./features/landing/LandingPage";
 
 export default function App() {
