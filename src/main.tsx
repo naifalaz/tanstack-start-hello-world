@@ -88,7 +88,13 @@ function NavBar() {
         >
           Semantic Demo
         </Link>
-
+        <Link
+          to="/hybrid-search"
+          activeProps={{ style: { fontWeight: 'bold', color: 'blue' } }}
+          style={{ textDecoration: 'none', color: '#333' }}
+        >
+          Hybrid Search
+        </Link>
         {/* ✅ New AI Search link */}
         <Link
           to="/ai-search"
