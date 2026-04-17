@@ -18,14 +18,14 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import './styles.css';
 import App from './App.tsx';
 import ContactPage from './features/contact/ContactPage.tsx';
-import ProductPage from './features/products/ProductPage.tsx';
+import ProductPage from './features/product/ProductPage.tsx';
 import SemanticDemoPage from './routes/semantic_demo.tsx';
 import { SemanticSearchPage } from './features/search/SemanticSearchPage';
 
 import { HybridSearchPage } from './features/search/HybridSearchPage';
 import { AiSearchPage } from './features/aiSearch/AiSearchPage';
 
-
+const aiSearchEnabled = import.meta.env.VITE_ENABLE_AI_SEARCH === 'true';// toggle this on/off
 // ✅ Navigation Bar
 //import { Link } from '@tanstack/router';
 
@@ -163,15 +163,37 @@ const aiSearchRoute = createRoute({
   path: '/ai-search',
   component: AiSearchPage,
 });
+
+const supabaseCheckRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/supabase-check',
+  component: function SupabaseCheckRoute() {
+    return (
+      <div style={{ padding: '1rem' }}>
+        <h2>Supabase Check</h2>
+        <p>
+          VITE_SUPABASE_URL:{' '}
+          {import.meta.env.VITE_SUPABASE_URL ? 'set' : 'not set'}
+        </p>
+        <p>
+          VITE_SUPABASE_ANON_KEY:{' '}
+          {import.meta.env.VITE_SUPABASE_ANON_KEY ? 'set' : 'not set'}
+        </p>
+      </div>
+    );
+  },
+});
 // ✅ Route Tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
   productRoute,
   contactRoute,
+  supabaseCheckRoute,
   semanticDemoRoute,
-  searchRoute,
-  hybridSearchRoute,
-  aiSearchRoute,
+
+  ...(aiSearchEnabled
+    ? [searchRoute, hybridSearchRoute, aiSearchRoute]
+    : []),
 ]);
 
 // ✅ Router

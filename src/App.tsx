@@ -5,3 +5,4 @@ export default function App() {
   // This is your root component
   return <LandingPage />;
 }
+//

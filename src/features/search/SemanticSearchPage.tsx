@@ -1,30 +1,10 @@
 // src/features/search/SemanticSearchPage.tsx
-import * as React from 'react';
-import { semanticSearchProducts, type SemanticProductRow } from './semanticSearch';
-
-function createPlaceholderEmbedding(input: string): number[] {
-  // Deterministic placeholder: converts the input string into a repeatable vector.
-  // This is NOT semantically meaningful; it’s just a stable stand-in until Topic 4.
-  const dims = 1024;
-  const vec = new Array<number>(dims).fill(0);
-
-  let hash = 2166136261;
-  for (let i = 0; i < input.length; i += 1) {
-    hash ^= input.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-
-  for (let i = 0; i < dims; i += 1) {
-    // Map hash-ish values into roughly [-1, 1]
-    const v = Math.sin(hash + i) * 0.5;
-    vec[i] = v;
-  }
-
-  return vec;
-}
+import * as React from "react";
+import { semanticSearchProducts, type SemanticProductRow } from "./semanticSearch";
+import { embedText } from "@/features/ai/embedText";
 
 export function SemanticSearchPage(): React.ReactElement {
-  const [query, setQuery] = React.useState<string>('');
+  const [query, setQuery] = React.useState<string>("");
   const [results, setResults] = React.useState<SemanticProductRow[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -35,7 +15,7 @@ export function SemanticSearchPage(): React.ReactElement {
   async function runSearch(): Promise<void> {
     const trimmed = query.trim();
     if (!trimmed) {
-      setError('Type a search query first.');
+      setError("Type a search query first.");
       setResults([]);
       return;
     }
@@ -44,18 +24,35 @@ export function SemanticSearchPage(): React.ReactElement {
     setError(null);
 
     try {
-      const queryEmbedding = createPlaceholderEmbedding(trimmed);
+      // ✅ Real embedding (Ollama)
+      const queryEmbedding = await embedText(trimmed);
+
       const rows = await semanticSearchProducts({
         queryEmbedding,
         matchCount,
         minSimilarity,
       });
+
       setResults(rows);
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      setError(message);
+      const message = e instanceof Error ? e.message : "Unknown error";
+
+      // ✅ Detect connection / Ollama issues
+      if (
+        message.toLowerCase().includes("failed to fetch") ||
+        message.toLowerCase().includes("networkerror") ||
+        message.toLowerCase().includes("network error") ||
+        message.toLowerCase().includes("connection refused")
+      ) {
+        setError(
+          "Cannot connect to the AI service. Make sure Ollama is running and accessible."
+        );
+      } else {
+        setError(message);
+      }
+
       setResults([]);
-    } finally {
+    }finally {
       setLoading(false);
     }
   }
@@ -63,10 +60,11 @@ export function SemanticSearchPage(): React.ReactElement {
   return (
     <div className="mx-auto w-full max-w-3xl p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Semantic Search</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">
+          Semantic Search
+        </h1>
         <p className="mt-2 text-sm text-slate-600">
-          Search products by meaning using pgvector cosine similarity. (Embeddings are
-          placeholders for now.)
+          Search products by meaning using pgvector cosine similarity. (Ollama embeddings)
         </p>
       </div>
 
@@ -74,6 +72,7 @@ export function SemanticSearchPage(): React.ReactElement {
         <label className="block text-sm font-medium text-slate-700">
           Search query
         </label>
+
         <div className="mt-2 flex gap-2">
           <input
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
@@ -81,9 +80,10 @@ export function SemanticSearchPage(): React.ReactElement {
             placeholder="e.g. lightweight laptop for travel"
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') void runSearch();
+              if (e.key === "Enter") void runSearch();
             }}
           />
+
           <button
             className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
             onClick={() => void runSearch()}
@@ -121,15 +121,15 @@ export function SemanticSearchPage(): React.ReactElement {
           </label>
         </div>
 
-        {loading ? (
+        {loading && (
           <p className="mt-4 text-sm text-slate-600">Searching…</p>
-        ) : null}
+        )}
 
-        {error ? (
+        {error && (
           <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
             {error}
           </div>
-        ) : null}
+        )}
       </div>
 
       <div className="mt-6">
@@ -150,9 +150,10 @@ export function SemanticSearchPage(): React.ReactElement {
                     {r.title}
                   </p>
                   <p className="mt-1 text-sm text-slate-600">
-                    {r.description ?? 'No description'}
+                    {r.description ?? "No description"}
                   </p>
                 </div>
+
                 <div className="shrink-0 rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
                   sim {r.similarity.toFixed(3)}
                 </div>
@@ -161,14 +162,12 @@ export function SemanticSearchPage(): React.ReactElement {
           ))}
         </ul>
 
-        {!loading && !error && results.length === 0 ? (
+        {!loading && !error && results.length === 0 && (
           <p className="mt-3 text-sm text-slate-600">
-            No matches yet. Try lowering min similarity or searching for something
-            broader.
+            No matches yet. Try lowering min similarity or searching for something broader.
           </p>
-        ) : null}
+        )}
       </div>
     </div>
   );
 }
-
