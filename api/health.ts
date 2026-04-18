@@ -1,17 +1,11 @@
-export default function handler(
-    request: Request,
-  ): Response {
-    const body = {
-      status: 'ok',
-      app: 'skylaunch',
-      timestamp: new Date().toISOString(),
-      environment: process.env.VERCEL_ENV ?? 'local'
-    };
+// api/health.ts
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-    return new Response(JSON.stringify(body), {
-      status: 200,
-      headers: {
-        'content-type': 'application/json'
-      }
-    });
-  }
+export default function handler(req: VercelRequest, res: VercelResponse) {
+  res.status(200).json({
+    status: 'ok',
+    app: 'skylaunch',
+    timestamp: new Date().toISOString(),
+    environment: process.env.VERCEL_ENV ?? 'local',
+  });
+}
